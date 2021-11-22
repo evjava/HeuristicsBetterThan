@@ -1,12 +1,15 @@
-from moving_ai.moving_ai_map import *
+import math
+
+from moving_ai.mai_map import *
 
 def check_ai_map(m_str, i, j, expected_cnt):
     lines = m_str.split('|')
     assert all(len(l) == len(lines[0]) for l in lines)
     m = MapMAI(len(lines[0]), len(lines), lines)
-    neighbors = list(m.get_neighbors(i, j))
+    neighbors = list(m.get_neighbors((i, j)))
     for n in neighbors:
-        compute_cost(i, j, *n)
+        co = m.compute_cost((i, j), n)
+        assert co in (1, math.sqrt(2))
     assert len(neighbors) == expected_cnt, f'expected cnt: {expected_cnt}, found: {neighbors}'
 
 def test_ai_gen_neighbors():
