@@ -69,7 +69,8 @@ class EnrichedRunResult(RunResult):
         
     @staticmethod
     def create(task: Task, res):
-        win, path_, n_exp, n_op = res
+        path_, n_exp, n_op = res
+        win = path_ is not None
         inst_args = prepare_result(task, res)
         return EnrichedRunResult(task, *inst_args, n_exp, n_op)
     
@@ -80,7 +81,7 @@ class EnrichedRunResult(RunResult):
         return EnrichedRunResult(*args_0, *args_1)
     
     def iter_coords(self):
-        yield from (self.task.start, self.task.goal)
+        yield from (self.task.start_c, self.task.goal_c)
         yield from (p.coord for p in self.path)
         yield from self.n_expanded.elements.keys()
         yield from self.n_opened.elements.keys()

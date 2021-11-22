@@ -1,7 +1,7 @@
 import pathlib
 
 from moving_ai.mai_map import MapMAI
-from pipeline import Reader
+from reader import Reader
 from task import Task
 
 def mai_task_from_line(line):
@@ -25,17 +25,24 @@ def _build_mai_path():
 MAI_PATH = _build_mai_path()
 
 class MaiReader(Reader):
-    def read(self):
+    def _map_path(self):
         name = self.payload
-        map_tasks = MAP_TASKS_CACHE.get(name)
-        if map_tasks is None:
-            map_path = f'{MAI_PATH}/{name}.map'
-            tasks_path = map_path + '.scen'
-            m = MapMAI.read_map_from_file(map_path)
-            ts = read_tasks_from_movingai_file(tasks_path)
-            map_tasks = m, ts
-            MAP_TASKS_CACHE[name] = map_tasks
-        return map_tasks
+        return f'{MAI_PATH}/{name}.map'
+    
+    def read_map(self):
+        map_path = self._map_path()
+        map_ = MAP_TASKS_CACHE.get(map_path)
+        if map_ is None:
+            map_ = MapMAI.read_map_from_file(map_path)
+            MAP_TASKS_CACHE[map_path] = map_
+        return map_
+
+    def read_tasks(self):
+        if self._selected_tasks is not None:
+            return self._selected_tasks
+        tasks_path = self._map_path() + '.scen'
+        ts = read_tasks_from_movingai_file(tasks_path)
+        return ts
 
 class MaiMaps:
     ARENA = 'arena'

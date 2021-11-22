@@ -1,13 +1,14 @@
 from algorithms.search_algorithm import SearchAlgorithm
 from node import Node
 from containers import Open, Closed
+from area import Area
 
 class Astar(SearchAlgorithm):
     def __init__(self, heuristic):
         super().__init__(f'A*(h={heuristic.__name__})')
         self.heuristic = heuristic
 
-    def run(self, area, start_coord, goal_coord):
+    def run(self, area: Area, start_coord, goal_coord):
         start = Node(coord=start_coord)
         goal = Node(coord=goal_coord)
 

@@ -90,7 +90,6 @@ class MapMAI:
                 yield (c, self.pos(c))
 
     def compute_cost(self, c1, c2):
-        ''' Computes cost of a move between the adjacent cells '''
         i1, j1 = c1
         i2, j2 = c2
         if abs(i1 - i2) + abs(j1 - j2) == 1: #cardinal move
@@ -98,6 +97,7 @@ class MapMAI:
         elif abs(i1 - i2) + abs(j1 - j2) == 2: #diagonal move
             return math.sqrt(2)
         else:
+            # todo maybe return +inf instead?
             msg = 'Trying to compute the cost of a non-supported move!' \
                   f'ONLY cardinal and diagonal moves are supported. (i1={i1}, j1={j1}, i2={i2}, j2={j2})'
             raise Exception(msg)

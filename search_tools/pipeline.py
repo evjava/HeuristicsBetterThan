@@ -1,27 +1,13 @@
-from algorithms.search_algorithm import SearchAlgorithm
-from containers import Open, Closed
 from typing import List, Callable, Tuple
 from dataclasses import dataclass
+
+from algorithms.search_algorithm import SearchAlgorithm
+from containers import Open, Closed
 from run_result import RunResult
 from node import Node
-
-@dataclass
-class Reader(object):
-    payload: str
-
-    def read(self):
-        raise AttributeError('Not implemented yet...')
-
-class Processor(object):
-    def process(self, results):
-        raise AttributeError('Not implemented yet...')
-
-@dataclass
-class LProcessor(Processor):
-    callback: any
-
-    def process(self, results):
-        self.callback(results)
+from task import Task
+from reader import Reader
+from processors.processor import Processor, LProcessor, AreaProcessor
 
 class Pipeline(object):
     def __init__(self,
@@ -42,10 +28,12 @@ class Pipeline(object):
     @property
     def m_tasks(self):
         if self._m_tasks is None:
-            self._m_tasks = self.reader.read()
+            self._m_tasks = self.reader.read_map_tasks()
         return self._m_tasks
 
-    def a_results(self, m, tasks):
+    def a_results(self, m, tasks: List[Task]):
+        tasks = (t for t in tasks if t.opt_len > 0)
+        tasks = sorted(tasks, key=lambda t:t.opt_len)
         if self._a_results is None:
             a_results = []
             for a in self.algorithms:
@@ -62,14 +50,20 @@ class Pipeline(object):
     def run(self):
         m, tasks = self.m_tasks
         a_results = self.a_results(m, tasks)
-        self.processor.process(a_results)
+        if isinstance(self.processor, AreaProcessor):
+            self.processor.area = m
+        result = self.processor.process(a_results)
+        return result
 
     def with_processor(self, processor):
         if callable(processor):
             processor = LProcessor(processor)
-        return Pipeline(
+        pipeline_upd = Pipeline(
             reader = self.reader,
             algorithms = self.algorithms,
             res_builder = self.res_builder,
             processor = processor,
         )
+        pipeline_upd._m_tasks = self._m_tasks
+        pipeline_upd._a_results = self._a_results
+        return pipeline_upd
