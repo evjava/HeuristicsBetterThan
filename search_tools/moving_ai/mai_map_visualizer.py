@@ -83,7 +83,8 @@ def draw_map(gmap: MapMAI, res: EnrichedRunResult, title, zoom=None):
     plt.title(title)
     plt.imshow(np.asarray(im))    
 
-make_bold = lambda s: "\033[1m" + s + "\033[0m"
+def make_bold(string):
+    return "\033[1m{}\033[0m".format(string)
 
 def flatten(xss):
     return [x for xs in xss for x in xs]
@@ -93,4 +94,4 @@ class VisualizeMaiMap(AreaProcessor):
         zoom = Zoom.calc_zoom(area, flatten([n_r[1] for n_r in all_results]))
         for a_name, rs in all_results:
             for er in rs:
-                draw_map(area, er, a_name)
+                draw_map(area, er, a_name, zoom)

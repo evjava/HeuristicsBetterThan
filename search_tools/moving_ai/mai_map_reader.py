@@ -46,5 +46,6 @@ class MaiReader(Reader):
 
 class MaiMaps:
     ARENA = 'arena'
+    DEN001D = 'den001d'
     STARCRAFT = 'starcraft1_Aurora'
     MOSCOW = 'street_Moscow_2_512'

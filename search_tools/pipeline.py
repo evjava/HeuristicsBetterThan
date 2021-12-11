@@ -36,6 +36,8 @@ class Pipeline(object):
         tasks = sorted(tasks, key=lambda t:t.opt_len)
         if self._a_results is None:
             a_results = []
+            # todo eliminate, move to some context? Maybe area?
+            Node.TIME = 0
             for a in self.algorithms:
                 # todo wrap try/except
                 # todo joblibs?

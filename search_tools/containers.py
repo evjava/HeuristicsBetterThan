@@ -31,6 +31,7 @@ class Open:
             node = self.queue.get()[1]
             if node.coord in self.elements:
                 del self.elements[node.coord]
+                # todo eliminate, move to some context? Maybe area?
                 node.time = Node.TIME
                 Node.TIME += 1
                 return node
