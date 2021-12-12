@@ -5,10 +5,14 @@ class Open:
     def __init__(self): 
         self.elements = {}
         self.queue = PriorityQueue()
-        
+        self.priorities = {}
+
     def push(self, node: Node, priority=None): 
         self.elements[node.coord] = node
+
         key = priority if priority is not None else node.comp()
+        self.priorities[node.coord] = key
+
         self.queue.put((key, node))
         
     def __iter__(self):

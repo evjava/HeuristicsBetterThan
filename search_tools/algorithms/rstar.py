@@ -4,6 +4,9 @@ from containers import Open, Closed
 from area import Area
 from algorithms.astar import Astar
 
+INF = 1e12
+
+
 class Rstar(SearchAlgorithm):
     def __init__(self, heuristic, D, K, w):
         super().__init__(f'A*(h={heuristic.__name__})')
@@ -29,9 +32,9 @@ class Rstar(SearchAlgorithm):
 
         def update(s):
             if s.g > self.w * self.heuristic(s.coord, self.start) or (s.path_to_bp is None and s.avoid):
-                op_nodes.push(s, priority=(1, s.g+self.w*h(s.coord, start.coord)))
+                op_nodes.push(s, priority=(1, s.g+self.w*self.h(s.coord, start.coord)))
             else:
-                op_nodes.push(s, priority=(0, s.g + self.w * h(s.coord, start.coord)))
+                op_nodes.push(s, priority=(0, s.g + self.w * self.h(s.coord, start.coord)))
 
         def reevaluate(s):
             s.path_to_bp, clow = astar(area, s.bp, s, 150)
@@ -48,23 +51,31 @@ class Rstar(SearchAlgorithm):
 
         while not op_nodes.is_empty:
             s = op_nodes.pop_best()
-            if s == goal:
-                return s, cl_nodes, op_nodes
-            if
-            if s is None or not cl_nodes.push(s):
-                continue
+            if op_nodes.priorities[goal] < op_nodes.priorities[s]:
+                break
+            if s != start and s.path_to_bp is None:
+                reevaluate(s)
+            else:
+                cl_nodes.push(s)
+                succs = area.random_neighbors(s.coord, self.K, self.D)
+                if area.dist(s.coord, goal.coord) < self.D:
+                    succs.append(goal.coord)
+                succs = [coord for coord in succs if not cl_nodes.is_visited(coord)]
+                for s_new_coord in succs:
+                    path, clow = None, self.heuristic(s.coord, s_new_coord)
 
-            for n_coord in area.get_neighbors(s.coord):
-                if cl_nodes.is_visited(n_coord):
-                    continue
-                n_op = op_nodes.find_by_coord(n_coord)
-                new_cost = s.g + area.compute_cost(s.coord, n_coord)
-                if n_op is None or new_cost < n_op.g:
-                    h = calc_h(n_coord)
-                    n_node = Node(n_coord, g=new_cost, h=h, parent=s)
-                    op_nodes.push(n_node)
+                    if op_nodes.find_by_coord(s_new_coord) is None:
+                        s_new = Node(s_new_coord)
+                        s_new.g = INF
+                        s_new.bp = None
+                    else:
+                        s_new = op_nodes.find_by_coord(s_new_coord)
+                    if s_new.bp is None or s.g+clow < s_new.g:
+                        s_new.g = s.g+clow
+                        s_new.bp = s
+                        update(s_new)
 
-        return None, cl_nodes, op_nodes
+        return op_nodes.find_by_coord(goal_coord), op_nodes, cl_nodes
 
 
 class Bounded_Astar(SearchAlgorithm):
