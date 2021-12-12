@@ -21,6 +21,10 @@ class Open:
     def is_empty(self):
         return len(self) == 0
 
+    @property
+    def is_not_empty(self):
+        return not(self.is_empty)
+
     def find_by_coord(self, coord):
         return self.elements.get(coord)
 
@@ -28,7 +32,7 @@ class Open:
         return self.find_by_coord(node.coord)
 
     def peek_best(self):
-        return self.queue[0][1]
+        return self.queue.queue[0][1]
 
     def pop_best(self):
         while not self.is_empty:
