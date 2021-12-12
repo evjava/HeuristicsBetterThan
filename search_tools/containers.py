@@ -8,7 +8,7 @@ class Open:
         
     def push(self, node: Node, priority=None): 
         self.elements[node.coord] = node
-        key = priority or node.comp()
+        key = priority if priority is not None else node.comp()
         self.queue.put((key, node))
         
     def __iter__(self):
