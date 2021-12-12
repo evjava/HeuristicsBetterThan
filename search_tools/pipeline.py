@@ -13,6 +13,7 @@ class Pipeline(object):
     def __init__(self,
                  reader:      Reader,
                  algorithms:  List[SearchAlgorithm],
+                 map_wrapper: Callable[Area, Area] = lambda x:x,
                  res_builder: Callable[Tuple[Node, Closed, Open], RunResult] = RunResult.create,
                  processor:   Processor = lambda x:x,
                  ):
@@ -32,6 +33,7 @@ class Pipeline(object):
         return self._m_tasks
 
     def a_results(self, m, tasks: List[Task]):
+        m = self.map_wrapper(m)
         tasks = (t for t in tasks if t.opt_len > 0)
         tasks = sorted(tasks, key=lambda t:t.opt_len)
         if self._a_results is None:
@@ -63,6 +65,7 @@ class Pipeline(object):
         pipeline_upd = Pipeline(
             reader = self.reader,
             algorithms = self.algorithms,
+            map_wrapper = self.map_wrapper,
             res_builder = self.res_builder,
             processor = processor,
         )
