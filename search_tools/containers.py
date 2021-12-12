@@ -6,9 +6,10 @@ class Open:
         self.elements = {}
         self.queue = PriorityQueue()
         
-    def push(self, node: Node): 
+    def push(self, node: Node, priority=None): 
         self.elements[node.coord] = node
-        self.queue.put((node.comp(), node))
+        key = priority or node.comp()
+        self.queue.put((key, node))
         
     def __iter__(self):
         return iter(self.elements.values())
@@ -25,6 +26,9 @@ class Open:
 
     def find(self, node):
         return self.find_by_coord(node.coord)
+
+    def peek_best(self):
+        return self.queue[0][1]
 
     def pop_best(self):
         while not self.is_empty:
