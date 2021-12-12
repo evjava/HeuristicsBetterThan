@@ -38,4 +38,4 @@ class AreaProcessor(Processor):
             raise AttributeError('Map is not installed!')
         if not all(len(ar[1]) == 1 for ar in all_results):
             raise AttributeError('Only one task for visualization expected!')
-        self.process_with_area(self.area, all_results)
+        return self.process_with_area(self.area, all_results)

@@ -2,9 +2,11 @@ from moving_ai.zoom import Zoom
 from moving_ai.mai_map import MapMAI
 from run_result import EnrichedRunResult
 from processors.processor import AreaProcessor
+import numpy as np
+import imageio
 # todo eliminate: just return image and draw it inside notebooks?
 import matplotlib.pyplot as plt
-import numpy as np
+from IPython.display import HTML
 
 from PIL import Image, ImageDraw
 
@@ -38,6 +40,7 @@ def mix_colors(col_a, col_b, beta):
     alpha = 1 - beta
     return tuple(int(alpha * a + beta * b) for a, b in zip(col_a, col_b))
 
+# todo generalize #make_image and #make_images
 def make_image(gmap: MapMAI, res: EnrichedRunResult, zoom):
     if not zoom: zoom = Zoom.no_zoom(gmap)
     
@@ -74,6 +77,48 @@ def make_image(gmap: MapMAI, res: EnrichedRunResult, zoom):
     
     return im
 
+# todo generalize #make_image and #make_images
+def make_images(gmap: MapMAI, res: EnrichedRunResult, zoom, draw_step):
+    if not zoom:
+        zoom = Zoom.no_zoom(gmap)
+    
+    im = Image.new('RGB', zoom.size(SC), color = 'white')
+    draw = ImageDraw.Draw(im)
+    
+    def draw_node(c, color):
+        c = zoom.convert(c)
+        if not c: return
+        x, y = c
+        draw.rectangle((x * SC, y * SC, (x + 1) * SC - 1, (y + 1) * SC - 1), fill=color, width=0)
+
+    def draw_nodes(nodes, color):
+        if not nodes: return
+        for node in nodes: draw_node(node.coord, color)
+
+    def draw_nodes_gradient(nodes, col_min, col_max):
+        nodes = sorted(nodes, key=lambda n:n.time)
+        if not nodes: 
+            return
+        max_time = max(n.time for n in nodes)
+        mix_cols = lambda time: mix_colors(col_min, col_max, time / max_time)
+
+        for i, node in enumerate(nodes):
+            draw_node(node.coord, mix_cols(node.time))
+            if i % draw_step == 0:
+                yield im
+        for _ in range(30):
+            yield im
+                
+
+    for c, tp in gmap.iter_coords_types(): draw_node(c, COL_MAP[tp])
+            
+    draw_nodes(res.n_opened, Colors.GRAY_WHITE)
+    draw_nodes(res.path, Colors.BLUE)
+    draw_node(res.task.start_c, Colors.RED)
+    draw_node(res.task.goal_c, Colors.GREEN)
+    
+    yield from draw_nodes_gradient(res.n_expanded, Colors.RED, Colors.GREEN)
+
 def draw_map(gmap: MapMAI, res: EnrichedRunResult, title, zoom=None):
     im = make_image(gmap, res, zoom)
 
@@ -81,8 +126,18 @@ def draw_map(gmap: MapMAI, res: EnrichedRunResult, title, zoom=None):
     ax.axes.xaxis.set_visible(False)
     ax.axes.yaxis.set_visible(False)
     plt.title(title)
-    plt.imshow(np.asarray(im))    
+    plt.imshow(np.asarray(im))
 
+def save_map_gif(gmap: MapMAI, res: EnrichedRunResult, title, zoom=None, step=5):
+    ims = make_images(gmap, res, zoom, step)
+    return ims
+
+    # fig, ax = plt.subplots(dpi=150)
+    # ax.axes.xaxis.set_visible(False)
+    # ax.axes.yaxis.set_visible(False)
+    # plt.title(title)
+    # plt.imshow(np.asarray(im))    
+    
 def make_bold(string):
     return "\033[1m{}\033[0m".format(string)
 
@@ -95,3 +150,28 @@ class VisualizeMaiMap(AreaProcessor):
         for a_name, rs in all_results:
             for er in rs:
                 draw_map(area, er, a_name, zoom)
+
+class VisualizeMaiMapGif(AreaProcessor):
+    def __init__(self, step=5, duration=100, out_path_prefix='./output/walk'):
+        super().__init__()
+        self.step = step
+        self.duration = duration
+        self.out_path_prefix = out_path_prefix
+
+    def process_with_area(self, area, all_results):
+        zoom = Zoom.calc_zoom(area, flatten([n_r[1] for n_r in all_results]))
+        i_paths = []
+        for a_name, rs in all_results:
+            for er in rs:
+                a_name_upd = a_name.replace('*', 'star').replace('.', '_')
+                i_path = f'{self.out_path_prefix}-{a_name}.gif'
+                ims_gen = make_images(area, er, zoom, self.step)
+
+                with imageio.get_writer(i_path, mode='I') as fout:
+                    for i in ims_gen:
+                        fout.append_data(np.array(i))
+                i_paths.append(i_path)
+
+        gif_fmt = '<b>{}</b> <img src="{}" width="750" align="center">'
+        html = '\n'.join(gif_fmt.format(a_n, i_p) for (a_n,_), i_p in zip(all_results, i_paths))
+        return HTML(html)
