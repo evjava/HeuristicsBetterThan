@@ -19,6 +19,7 @@ class Pipeline(object):
                  ):
         self.reader = reader
         self.algorithms = algorithms
+        self.map_wrapper = map_wrapper
         self.res_builder = res_builder
         if callable(processor):
             processor = LProcessor(processor)
