@@ -1,6 +1,7 @@
 from typing import List, Callable, Tuple
 from dataclasses import dataclass
 
+from area import Area
 from algorithms.search_algorithm import SearchAlgorithm
 from containers import Open, Closed
 from run_result import RunResult
