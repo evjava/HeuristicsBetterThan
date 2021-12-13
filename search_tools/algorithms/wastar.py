@@ -1,7 +1,4 @@
 from algorithms.search_algorithm import SearchAlgorithm
-from node import Node
-from containers import Open, Closed
-from area import Area
 from algorithms.astar import Astar
 
 class WAstar(Astar):

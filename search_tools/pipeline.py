@@ -1,10 +1,9 @@
 from typing import List, Callable, Tuple
 from dataclasses import dataclass
 
-from area import Area
-from algorithms.search_algorithm import SearchAlgorithm
-from containers import Open, Closed
-from run_result import RunResult
+from areas.area import Area
+from algorithms.search_algorithm import SearchAlgorithm, RunOutput
+from run_result import RunResult, AreaRunResult
 from node import Node
 from task import Task
 from reader import Reader
@@ -14,14 +13,12 @@ class Pipeline(object):
     def __init__(self,
                  reader:      Reader,
                  algorithms:  List[SearchAlgorithm],
-                 map_wrapper: Callable[Area, Area] = lambda x:x,
-                 res_builder: Callable[Tuple[Node, Closed, Open], RunResult] = RunResult.create,
+                 res_builder: Callable[RunOutput, RunResult] = RunResult.create,
                  processor:   Processor = lambda x:x,
                  ):
         self.reader = reader
         self.algorithms = algorithms
-        self.map_wrapper = map_wrapper
-        self.res_builder = res_builder
+        self.res_builder = AreaRunResult.create if processor.is_area() else RunResult.create
         if callable(processor):
             processor = LProcessor(processor)
         self.processor = processor
@@ -35,7 +32,6 @@ class Pipeline(object):
         return self._m_tasks
 
     def a_results(self, m, tasks: List[Task]):
-        m = self.map_wrapper(m)
         tasks = (t for t in tasks if t.opt_len > 0)
         tasks = sorted(tasks, key=lambda t:t.opt_len)
         if self._a_results is None:
@@ -67,8 +63,6 @@ class Pipeline(object):
         pipeline_upd = Pipeline(
             reader = self.reader,
             algorithms = self.algorithms,
-            map_wrapper = self.map_wrapper,
-            res_builder = self.res_builder,
             processor = processor,
         )
         pipeline_upd._m_tasks = self._m_tasks
