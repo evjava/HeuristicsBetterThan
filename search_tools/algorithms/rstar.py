@@ -5,9 +5,9 @@ from containers import Open as Open1
 from containers import Closed as Closed1
 from area import Area
 from algorithms.astar import Astar
-
+from collections import defaultdict
 INF = 1e12
-
+Time = 0
 
 class Rstar(SearchAlgorithm):
     def __init__(self, heuristic, D, K, w):
@@ -17,12 +17,15 @@ class Rstar(SearchAlgorithm):
         self.astar = Bounded_Astar(h=heuristic.__name__)
 
     def run(self, area: Area, start_coord, goal_coord):
+        global Time
+        Time = 0
         path, g, k, bp, avoid = {}, {}, {}, {}, {}
 
         start, goal = start_coord, goal_coord
         open, closed = Open(), Closed()
-
+        time_open, time_closed = defaultdict(lambda : INF), defaultdict(lambda : INF)
         open.push(start)
+        time_open[start] = 0
 
         def update(s):
             if g[s] > self.w * self.heuristic(s, start) or (
@@ -31,7 +34,9 @@ class Rstar(SearchAlgorithm):
             else:
                 k[s] = (0, g[s] + self.w * self.h(s, start))
             open.push(s, key=k[s])
-
+            if time_open[s] > Time:
+                time_open[s] = Time
+            Time += 1
         def reevaluate(s):
             path[s][bp[s]] = self.astar(area, bp[s], s, 150)
 
@@ -52,6 +57,9 @@ class Rstar(SearchAlgorithm):
                 reevaluate(s)
             else:
                 closed.push(s)
+                if time_closed[s] > Time:
+                    time_closed[s] = Time
+                Time += 1
                 succs = area.random_neighbors(s, self.K, self.D)
                 if area.dist(s, goal) <= self.D:
                     succs.append(goal)
@@ -94,7 +102,7 @@ class Bounded_Astar(SearchAlgorithm):
         op_nodes = Open1()
         op_nodes.push(start)
         cl_nodes = Closed1()
-
+        time_open, time_closed = {}, {}
         while not op_nodes.is_empty:
             if len(cl_nodes) > max_closed:
                 break
