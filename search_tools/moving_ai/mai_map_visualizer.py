@@ -158,7 +158,7 @@ class VisualizeMaiMapGif(AreaProcessor):
         for a_name, rs in all_results:
             for er in rs:
                 a_name_upd = a_name.replace('*', 'star').replace('.', '_')
-                i_path = f'{self.out_path_prefix}-{a_name}.gif'
+                i_path = f'{self.out_path_prefix}-{a_name_upd}.gif'
                 ims_gen = make_images(area, er, zoom, self.step)
 
                 with imageio.get_writer(i_path, mode='I') as fout:
