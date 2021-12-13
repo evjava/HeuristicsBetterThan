@@ -1,32 +1,12 @@
 from dataclasses import dataclass
 from task import Task
 from typing import List
-from node import Node
-from containers import Open, Closed
+from containers.base_container import Container
 
 EPS = 0.000001
 
-def make_path(goal):
-    '''
-    Creates a path by tracing parent pointers from the goal node to the start node
-    It also returns path's length.
-    '''
-    length = goal.g
-    current = goal
-    path = []
-    while current.parent:
-        path.append(current)
-        current = current.parent
-    path.append(current)
-    return path[::-1], length
-
-def prepare_result(task: Task, res):
-    path_, n_exp, n_op = res
-    win = path_ is not None
-    if win:
-        path, act_len = make_path(path_)
-    else:
-        path, act_len = None, None
+def prepare_result(task: Task, path, n_exp, n_op):
+    act_len = path.cost if path else None
     inst_args = (len(n_op) + len(n_exp), len(n_exp), act_len, task.opt_len, path)
     return inst_args
 
@@ -47,41 +27,47 @@ class RunResult:
     @property
     def report(self):
         if self.path_found():
-            msg = f'Path found! Length: {self.act_len:.3f}. ' \
-                  f'Nodes created: {self.nodes_created}. ' \
-                  f'Number of steps: {self.steps}. ' \
-                  f'Correct: {self.correct()}.'
+            opt = 'True' if self.correct() else f'False (opt: {self.opt_len:.3f})'
+            msg = f'Path found! Length: {self.act_len:.3f}\n' \
+                  f'Nodes created: {self.nodes_created}.\n' \
+                  f'Number of steps: {self.steps}.\n' \
+                  f'Correct: {opt}.'
         else:
             msg = 'Path not found!'
         return msg
     
     @staticmethod
     def create(task: Task, res):
-        inst_args = prepare_result(task, res)
+        inst_args = prepare_result(task, *res)
         return RunResult(task, *inst_args[:-1])
-    
 
 @dataclass
-class EnrichedRunResult(RunResult):
-    path:       List[Node]
-    n_expanded: Closed
-    n_opened:   Open
+class AreaRunResult(RunResult):
+    path:       Container
+    n_expanded: Container
+    n_opened:   Container
         
     @staticmethod
     def create(task: Task, res):
         path_, n_exp, n_op = res
         win = path_ is not None
-        inst_args = prepare_result(task, res)
-        return EnrichedRunResult(task, *inst_args, n_exp, n_op)
+        inst_args = prepare_result(task, *res)
+        return AreaRunResult(task, *inst_args, n_exp, n_op)
     
     def drop_expanded(s, max_time):
         args_0 = s.task, s.nodes_created, s.steps, s.act_len, s.opt_len
         new_expanded = [i for i in s.n_expanded if i.time <= max_time]
         args_1 = s.path, new_expanded, s.n_opened
-        return EnrichedRunResult(*args_0, *args_1)
+        return AreaRunResult(*args_0, *args_1)
     
     def iter_coords(self):
         yield from (self.task.start_c, self.task.goal_c)
-        yield from (p.coord for p in self.path)
+        # todo fix after API refinement
+        yield from self.path
+        # todo remove!
+        # if isinstance(self.path[0], Node):
+        #     yield from (p.coord for p in self.path)
+        # else:
+        #     yield from self.path
         yield from self.n_expanded.elements.keys()
         yield from self.n_opened.elements.keys()

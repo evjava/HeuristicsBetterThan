@@ -1,7 +1,8 @@
 from algorithms.search_algorithm import SearchAlgorithm
 from node import Node
-from containers import Open, Closed
-from area import Area
+from containers.containers_coord_nodes import Open, Closed
+from containers.path import path_from_node
+from areas.area import Area
 
 class Astar(SearchAlgorithm):
     def __init__(self, heuristic):
@@ -21,7 +22,7 @@ class Astar(SearchAlgorithm):
         while not op_nodes.is_empty:
             s = op_nodes.pop_best()
             if s == goal:
-                return s, cl_nodes, op_nodes
+                return path_from_node(s), cl_nodes, op_nodes
             if s is None or not cl_nodes.push(s):
                 continue
     

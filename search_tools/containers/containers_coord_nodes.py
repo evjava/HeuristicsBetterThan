@@ -1,9 +1,11 @@
 from node import Node
 from queue import PriorityQueue
+from containers.base_container import Container
 
-class Open:
+class Open(Container):
+    ''' keys: coordinates, values: nodes '''
     def __init__(self): 
-        self.elements = {}
+        self.elements: Dict[Tuple, Node] = {}
         self.queue = PriorityQueue()
         
     def push(self, node: Node, priority=None): 
@@ -11,11 +13,10 @@ class Open:
         key = priority if priority is not None else node.comp()
         self.queue.put((key, node))
         
-    def __iter__(self):
-        return iter(self.elements.values())
-
-    def __len__(self):
-        return len(self.elements)
+    def __iter__(self): return iter(self.elements.values())
+    def __len__(self):  return len(self.elements)
+    def coords(self):   return iter(self.elements)
+    def time(self, e):  return self.elements[e].time
 
     @property
     def is_empty(self):
@@ -45,16 +46,15 @@ class Open:
                 return node
         return None
 
-
-class Closed:
+class Closed(Container):
+    ''' keys: coordinates, values: nodes '''
     def __init__(self):
-        self.elements = {}
+        self.elements: Dict[Tuple, Node] = {}
 
-    def __iter__(self):
-        return iter(self.elements.values())
-
-    def __len__(self):
-        return len(self.elements)
+    def __iter__(self): return iter(self.elements.values())
+    def __len__(self):  return len(self.elements)
+    def coords(self):   return iter(self.elements)
+    def time(self, e):  return self.elements[e].time
 
     @property
     def is_empty(self):

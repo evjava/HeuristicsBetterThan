@@ -2,4 +2,4 @@
 
 Repository to compare R* and MRA*.
 
-Explore `01_Example.ipynb` to understand workflow
+Explore notebooks to understand workflow.
