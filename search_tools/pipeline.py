@@ -13,7 +13,6 @@ class Pipeline(object):
     def __init__(self,
                  reader:      Reader,
                  algorithms:  List[SearchAlgorithm],
-                 res_builder: Callable[RunOutput, RunResult] = RunResult.create,
                  processor:   Processor = lambda x:x,
                  ):
         self.reader = reader
