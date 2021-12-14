@@ -28,7 +28,9 @@ def merge_containers(containers):
 
 class Rstar(SearchAlgorithm):
     def __init__(self, heuristic, D, K, w):
-        super().__init__(f'A*(h={heuristic.__name__})')
+        h_name = heuristic.__name__
+        name = f'R*(h={h_name}, D={D}, K={K}, w={w})'
+        super().__init__(name)
         self.h = heuristic
         self.D, self.K, self.w = D, K, w
         self.astar = Bounded_Astar(heuristic)
@@ -43,7 +45,6 @@ class Rstar(SearchAlgorithm):
         open, closed = Open1(), Closed1()
 
         open_time, closed_time = OpenTime(), ClosedTime()
-        astar_time_open_containers, astar_time_closed_containers = [], []
 
         g[goal_coord] = INF
         bp[goal_coord] = bp[start_coord] = None
@@ -57,16 +58,21 @@ class Rstar(SearchAlgorithm):
         open_time.push(start, 0)
 
         def update(s):
-            if g[s] > self.w * self.h(*s, *start) or (
-                    path[s][bp[s]][0] is None and avoid[s]):
-                k[s] = (1, g[s] + self.w * self.h(*s, *start))
+            if g[s] > self.w * self.h(*s, *start) or (path[s][bp[s]][0] is None and avoid[s]):
+                    k[s] = (1, g[s] + self.w * self.h(*s, *goal))
             else:
-                k[s] = (0, g[s] + self.w * self.h(*s, *start))
+                k[s] = (0, g[s] + self.w * self.h(*s, *goal))
+                #avoid[s] = True
+            #else:
+                #avoid[s] = False
+
+            #k[s] = (avoid[s], g[s] + self.w * self.h(*s, *goal))
+
             open.push(s, key=k[s])
             open_time.push(s, 0)
 
         def reevaluate(s):
-            path[s][bp[s]] = self.astar.run(area, bp[s], s, open_time, closed_time, 200)
+            path[s][bp[s]] = self.astar.run(area, bp[s], s, open_time, closed_time, 300)
 
             if path[s][bp[s]][0] is None or (g[s] > self.w * self.h(*start, *s)):
                 avoid[s] = True
@@ -78,8 +84,8 @@ class Rstar(SearchAlgorithm):
 
         while not open.is_empty:
             S_double = open.peek_best()
-            if S_double[0][0] == 1:
-                return [], merge_containers([open_time]), merge_containers([closed_time])
+            #if S_double[0][0] == 1:
+            #    return [], merge_containers([open_time]), merge_containers([closed_time])
             s = open.pop_best()
             if s == goal:
                 print(1)
@@ -89,6 +95,8 @@ class Rstar(SearchAlgorithm):
             if s != start and path[s][bp[s]][0] is None:
                 reevaluate(s)
             else:
+                if s == goal:
+                    break
                 closed.push(s)
                 closed_time.push(s, open_time.time)
                 succs = area.generate_random_neighbors(s, self.K, self.D)
@@ -115,7 +123,7 @@ class Rstar(SearchAlgorithm):
             s = bp[s]
         global_path = Path(global_path)
 
-        return global_path, open_time, closed_time
+        return global_path, merge_containers([open_time]), merge_containers([closed_time])
 
 
 class Bounded_Astar(SearchAlgorithm):
