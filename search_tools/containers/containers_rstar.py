@@ -1,18 +1,22 @@
 from node import Node
 from queue import PriorityQueue
-from sortedcontainers import SortedSet
+from sortedcontainers import SortedDict
 
 class Open:
     def __init__(self):
-        self.elements = SortedSet()
+        self.elements = SortedDict()
         self.seen_elements = {}
+        self.time = 0
 
     def push(self, coord, key):
         if coord in self.seen_elements:
             old_key = self.seen_elements[coord]
             if (old_key, coord) in self.elements:
-                self.elements.remove((old_key, coord))
-        self.elements.add((key, coord))
+                del self.elements[(old_key, coord)]
+
+        self.elements[(key, coord)] = (coord, self.time)
+        self.time += 1
+
         self.seen_elements[coord] = key
 
     def __iter__(self):
@@ -40,7 +44,7 @@ class Open:
 
     def pop_best(self):
         while not self.is_empty:
-            coord = self.elements.pop(0)[1]
+            coord = self.elements.popitem(index=0)[1][0]
             return coord
             #if coord in self.elements:
             #    del self.elements[coord]
@@ -71,10 +75,10 @@ class Closed:
     def is_visited(self, coord):
         return coord in self.elements
 
-    def push(self, coord):
+    def push(self, coord, time):
         if self.is_visited(coord):
             return False
         else:
-            self.elements[coord] = coord
+            self.elements[coord] = time
             return True
 
