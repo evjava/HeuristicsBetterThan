@@ -141,7 +141,10 @@ class VisualizeMaiMap(AreaProcessor):
         zoom = Zoom.calc_zoom(area, flatten([n_r[1] for n_r in all_results]))
         for a_name, rs in all_results:
             for er in rs:
-                draw_map(area, er, a_name, zoom)
+                op_len, cl_len = len(er.n_opened), len(er.n_expanded)
+                subopt_ratio = er.act_len / er.opt_len
+                title = f'{a_name}: op={op_len}, cl={cl_len}, subopt={subopt_ratio:.2f}'
+                draw_map(area, er, title, zoom)
 
 class VisualizeMaiMapGif(AreaProcessor):
     def __init__(self, step=5, duration=100, out_path_prefix='./output/walk'):

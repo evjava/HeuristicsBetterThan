@@ -10,12 +10,13 @@ def _plot_all_results(all_results, smooth_sz = 10, smooth_sz_2 = 10):
     for h_name, rs in all_results:
         # expected sorted results
         sorted_rs = rs
-        xs = [i.opt_len for i in sorted_rs]
-        ys1 = [i.nodes_created for i in sorted_rs]
+        xs_ys1 = [(i.opt_len, i.nodes_created) for i in sorted_rs if i and i.nodes_created]
+        xs, ys1 = [i[0] for i in xs_ys1], [i[1] for i in xs_ys1]
         ax1.plot(xs, _smooth(ys1, smooth_sz), label=h_name)
         ax1.title.set_text('[Number of expanded (Y)] on [length of optimal path (X)]')
         
-        ys2 = [i.act_len / i.opt_len for i in sorted_rs]
+        xs_ys2 = [(i.opt_len, i.act_len / i.opt_len) for i in sorted_rs if i and i.nodes_created]
+        ys2 = [i[1] for i in xs_ys2]
         ax2.plot(xs, _smooth(ys2, smooth_sz_2), label=h_name)
         ax2.title.set_text('[Actual / Optimal lengths (Y)] on [length of optimal path (X)]')
         

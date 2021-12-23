@@ -61,9 +61,10 @@ def _get_or_none(elem, idx):
     return elem[idx] if elem else None
 
 class DictContainer(Container):
-    def __init__(self, elements):
+    def __init__(self, elements, total_len=None):
         self.elements = elements
+        self.total_len = total_len or len(self.elements)
         
     def time(self, e): return self.elements[e]
     def coords(self):  return iter(self.elements)
-    def __len__(self): return len(self.elements)
+    def __len__(self): return self.total_len

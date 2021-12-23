@@ -92,7 +92,7 @@ def merge_containers(containers):
             t_old = es.get(e, INF)
             if t < t_old:
                 es[e] = t
-    return DictContainer(es)
+    return DictContainer(es, sum(map(len, containers)))
 
 class QueueSelector(object):
     def __init__(self, qs):

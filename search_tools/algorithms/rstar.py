@@ -19,17 +19,13 @@ def merge_containers(containers):
     es = {}
     # todo reuse containers[0]
     for c in containers:
-        if isinstance(c, OpenRstar):
-            for e, t in c.elements.values():
-                t_old = es.get(e, INF)
-                if t < t_old:
-                    es[e] = t
-        else:
-            for e, t in c.elements.items():
-                t_old = es.get(e, INF)
-                if t < t_old:
-                    es[e] = t
-    return DictContainer(es)
+        ce = c.elements
+        ets = ce.values() if isinstance(c, OpenRstar) else ce.items()
+        for e, t in ets:
+            t_old = es.get(e, INF)
+            if t < t_old:
+                es[e] = t
+    return DictContainer(es, sum(map(len, containers)))
 
 class Rstar(SearchAlgorithm):
     def __init__(self, heuristic, D, K, w, exp_coeff=4):

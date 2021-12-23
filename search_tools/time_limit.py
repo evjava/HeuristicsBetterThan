@@ -3,15 +3,9 @@ import threading
 import _thread
 import time
 
-from loguru import logger as log
-log.remove()
-log.add('runs.log', format='{time}  {level} {name} {message}', level='INFO')
-
 class TimeoutException(Exception):
     def __init__(self, msg=''):
         self.msg = msg
-
-import traceback
 
 @contextmanager
 def time_limit(seconds, msg='Failed'):
@@ -25,8 +19,6 @@ def time_limit(seconds, msg='Failed'):
             yield
         except KeyboardInterrupt as ex:
             time_total = time.time() - time_start
-            traceback.print_exc()
-            log.info(time_total, seconds)
             if time_total < seconds:
                 raise KeyboardInterrupt('Interrupted')
             else:

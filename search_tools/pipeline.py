@@ -76,11 +76,11 @@ class Pipeline(object):
                 algo_res = algo.run(area, task.start_c, task.goal_c)
                 res = self.res_builder(task, algo_res)
             log.success('Done task idx={} ({})', ti, len(tasks))
-        except KeyboardInterrupt:
-            raise
+        except KeyboardInterrupt as ex:
+            raise ex
         except Exception as ex:
-            traceback.print_exc()
-            log.error("Failed")
+            # traceback.print_exc()
+            log.error("Task idx={} failed, not enough time", ti)
             res = None
         return res
             
@@ -116,3 +116,8 @@ class Pipeline(object):
         pipeline_upd._m_tasks = self._m_tasks
         pipeline_upd._a_results = self._a_results
         return pipeline_upd
+
+    def clear_cache(self):
+        self._m_tasks = None
+        self._a_results = None
+
