@@ -57,11 +57,11 @@ p = Pipeline(
 Algorithm_comparation.ipynb содержит сравнения A*, WA*, R* и MRA* на различных картах
 
 ### Ссылки:
-* Likhachev, M.; and Stentz, A. 2008. R* Search. In Proceedings of the 23rd AAAI Conference on Artificial Intelligence, AAAI 2008 (pp. 344-350).
+1. Likhachev, M.; and Stentz, A. 2008. R* Search. In Proceedings of the 23rd AAAI Conference on Artificial Intelligence, AAAI 2008 (pp. 344-350).
 https://www.aaai.org/Papers/AAAI/2008/AAAI08-054.pdf
-* Du, W., Islam, F. and Likhachev, M., 2020. Multi-resolution A. In Proceedings of the 13th International Symposium on Combinatorial Search, SoCS 2020. (pp. 29-37).
+2. Du, W., Islam, F. and Likhachev, M., 2020. Multi-resolution A. In Proceedings of the 13th International Symposium on Combinatorial Search, SoCS 2020. (pp. 29-37).
 https://aaai.org/ocs/index.php/SOCS/SOCS20/paper/viewFile/18515/17554
-* Benchmarks for Grid-Based Pathfinding, Transactions on Computational Intelligence and AI in Games, 2012, http://web.cs.du.edu/~sturtevant/papers/benchmarks.pdf
+3. Benchmarks for Grid-Based Pathfinding, Transactions on Computational Intelligence and AI in Games, 2012, http://web.cs.du.edu/~sturtevant/papers/benchmarks.pdf
 
 ![visAfterW](./pictures/MRAstar.png)
 ![visAfterW](./pictures/Rstar.png)

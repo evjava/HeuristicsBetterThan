@@ -8,16 +8,19 @@ from node import Node
 from task import Task
 from reader import Reader
 from processors.processor import Processor, LProcessor, AreaProcessor
+from time_limit import time_limit
 
 class Pipeline(object):
     def __init__(self,
                  reader:      Reader,
                  algorithms:  List[SearchAlgorithm],
                  processor:   Processor = lambda x:x,
+                 timelimit: int = 10,
                  ):
         self.reader = reader
         self.algorithms = algorithms
         self.res_builder = AreaRunResult.create if processor.is_area() else RunResult.create
+        self.timelimit = timelimit
         if callable(processor):
             processor = LProcessor(processor)
         self.processor = processor
@@ -40,10 +43,14 @@ class Pipeline(object):
             for a in self.algorithms:
                 # todo wrap try/except
                 # todo joblibs?
-                a_out = [
-                    self.res_builder(t, a.run(m, t.start_c, t.goal_c))
-                    for t in tasks
-                ]
+                a_out = []
+
+                for t in tasks:
+                    try:
+                        with time_limit(self.timelimit, msg=''):
+                            a_out.append(self.res_builder(t, a.run(m, t.start_c, t.goal_c)))
+                    except:
+                        a_out.append(None)
                 a_results.append((a.name, a_out))
             self._a_results = a_results
         return self._a_results
