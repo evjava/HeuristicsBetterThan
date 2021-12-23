@@ -1,7 +1,7 @@
 from pipeline import Processor
 from scipy.ndimage.filters import uniform_filter1d
 import matplotlib.pyplot as plt
-_colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
+_colors = ['red', 'orange', 'yellow', 'green','cyan', 'blue', 'purple', 'crimson']
 
 def _plot_all_results(all_results, smooth_sz=10, smooth_sz_2=10):
     fig, ax = plt.subplots(1, 1)
