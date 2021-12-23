@@ -1,5 +1,7 @@
 import math
 import itertools as it
+import matplotlib.pyplot as plt
+import numpy as np
 
 _cst = lambda i1, j1, i2, j2: abs(i1 - i2) + abs(j1 - j2)
 
@@ -101,3 +103,11 @@ class MapMAI:
             msg = 'Trying to compute the cost of a non-supported move!' \
                   f'ONLY cardinal and diagonal moves are supported. (i1={i1}, j1={j1}, i2={i2}, j2={j2})'
             raise Exception(msg)
+
+    def draw(self, name):
+        trav_cells = np.zeros((self._width, self._height))
+        for i in range(self._width):
+            for j in range(self._height):
+                trav_cells[i][j] = self.traversable((i,j))
+        plt.imshow(trav_cells)
+        plt.title(name)

@@ -2,10 +2,10 @@ from copy import deepcopy
 from task import Task
 
 class Reader(object):
-    def __init__(self, payload: str):
+    def __init__(self, payload: str, num_tasks=None):
         self.payload = payload
         self._selected_tasks = None
-
+        self.num_tasks = num_tasks
     def read_map(self):
         ''' reads map '''
         raise AttributeError('Not implemented yet...')
