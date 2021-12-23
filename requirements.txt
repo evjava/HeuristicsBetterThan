@@ -1,0 +1,9 @@
+setuptools>=59.2.0
+matplotlib>=3.3.4
+numpy>=1.21.4
+imageio>=2.13.3
+ipython>=7.29.0
+pillow>=8.4.0
+loguru>=0.5.3
+sortedcontainers>=2.4.0
+scipy>=1.6.1
