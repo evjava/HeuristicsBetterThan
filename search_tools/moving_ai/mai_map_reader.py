@@ -43,9 +43,6 @@ class MaiReader(Reader):
             return self._selected_tasks
         tasks_path = self._map_path() + '.scen'
         ts = read_tasks_from_movingai_file(tasks_path)
-        if self.num_tasks is not None:
-            if self.num_tasks < len(ts):
-                ts = random.sample(ts, self.num_tasks)
         return ts
 
 class MaiMaps:

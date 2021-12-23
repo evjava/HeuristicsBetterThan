@@ -42,12 +42,12 @@ class MRAstar(SearchAlgorithm):
             s, t = OPEN[i].pop_best()
             time[0] += 1
             CLOSED[i].push(s, time[0])
-            log.info('expanding: s={}, i={}', s, i)
+            # log.info('expanding: s={}, i={}', s, i)
             for sn in area.get_hop_neighbours(s, space_indices.hops[i]):
                 if sn not in g: 
                     g[sn], bp[sn] = INF, None
                 cost = area.compute_cost(s, sn)
-                log.info('cost: {}', cost)
+                # log.info('cost: {}', cost)
                 g_upd = g[s] + cost
                 if g[sn] > g_upd:
                     g[sn], bp[sn] = g_upd, s
@@ -59,8 +59,8 @@ class MRAstar(SearchAlgorithm):
             if i is None: break
 
             mk_i, mk_0 = OPEN[i].min_key or INF, OPEN[0].min_key or INF
-            log.info('chosen q={}, mk[i]={:.3f}, w_2*mk[0]={:.3f}', i, mk_i, self.w_2 * mk_0)
-            log.info('q sizes: {}', [len(i) for i in OPEN])
+            # log.info('chosen q={}, mk[i]={:.3f}, w_2*mk[0]={:.3f}', i, mk_i, self.w_2 * mk_0)
+            # log.info('q sizes: {}', [len(i) for i in OPEN])
             if mk_i <= self.w_2 * mk_0:
                 if g[goal_c] <= mk_i: break
                 expand_q_state(i)
@@ -68,7 +68,7 @@ class MRAstar(SearchAlgorithm):
                 if g[goal_c] <= self.w_2 * mk_0: break
                 expand_q_state(0)
         
-        log.success('done! {:.3f}', g[goal_c])
+        # log.success('done! {:.3f}', g[goal_c])
         path = make_path(area, bp, g, goal_c)
         return path, merge_containers(OPEN), merge_containers(CLOSED)
 

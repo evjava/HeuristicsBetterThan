@@ -19,3 +19,6 @@ class SearchAlgorithm(object):
             - Open
         '''
         raise AttributeError('Not implemented yet...')
+
+    def __str__(self):
+        return self.name
