@@ -10,6 +10,7 @@ class Astar(SearchAlgorithm):
         self.heuristic = heuristic
 
     def run(self, area: Area, start_coord, goal_coord):
+        Node.TIME = 0
         start = Node(coord=start_coord)
         goal = Node(coord=goal_coord)
 

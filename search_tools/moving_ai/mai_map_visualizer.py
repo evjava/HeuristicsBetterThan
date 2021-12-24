@@ -99,8 +99,9 @@ def make_images(gmap: MapMAI, res: AreaRunResult, zoom, draw_step):
         if not nodes: return
         max_time = max(nodes.time(c) for c in nodes.coords())
         mix_cols = lambda time: mix_colors(col_min, col_max, time / max_time)
+        sorted_nodes = sorted(nodes.coords(), key=nodes.time)
 
-        for i, coord in enumerate(nodes.coords()):
+        for i, coord in enumerate(sorted_nodes):
             draw_node(coord, mix_cols(nodes.time(coord)))
             if i % draw_step == 0:
                 yield im
